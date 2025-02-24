@@ -66,3 +66,21 @@ Render for long-running cloud compute for web app:
 Vercel for function based cloud compute (similar to AWS lambda) to be used in data ingestion:
 
 * [https://vercel.com/](https://vercel.com/) 
+
+
+* For Development *
+
+Create and activate virtual environment.
+```
+python -m venv .venv
+source .venv/Scripts/activate 
+#.venv/Scripts/activate for powershell or command prompt
+#.venv/Scripts/activate.bat otherwise
+```
+You should see a little (.venv) tag in your terminal now.
+
+
+Run the following for installation requirements
+```
+pip install -r requirements.txt
+```
