@@ -1,0 +1,6 @@
+chainlit
+hugchat
+python-dotenv
+sentence-transformers 
+scipy
+numpy
