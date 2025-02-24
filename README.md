@@ -90,7 +90,7 @@ source .venv/Scripts/activate
 You should see a little (.venv) tag in your terminal now.
 
 
-Run the following for installation requirements
+Run the following for installation requirements (this might take a while so be patient)
 ```
 pip install -r requirements.txt
 ```
