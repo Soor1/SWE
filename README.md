@@ -70,6 +70,16 @@ Vercel for function based cloud compute (similar to AWS lambda) to be used in da
 
 * For Development *
 
+Go to a directory where you want the project.
+```
+git clone https://github.com/Soor1/SWE.git
+```
+
+Create a new branch based off of dev.
+```
+git checkout -b new-branch-name dev
+```
+
 Create and activate virtual environment.
 ```
 python -m venv .venv
