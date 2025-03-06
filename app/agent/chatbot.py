@@ -6,9 +6,15 @@ from hugchat.login import Login
 # Create account on https://huggingface.co/
 # Login https://huggingface.co/chat/
 
+import os
+from dotenv import load_dotenv
+
 class RAGAgent:
     def __init__(self):
         """Initialize the RAGAgent class, hugchat client, and load environment variables."""
+        load_dotenv()
+        EMAIL = os.getenv("EMAIL")
+        PASSWD = os.getenv("PASSWD")
         ...
 
     def retrieve_similar_question(self, user_query):
