@@ -21,7 +21,6 @@ class RAGAgent:
         sign = Login(email, password)
         cookies = sign.login(cookie_dir_path=cookie_path_dir, save_cookies=True)
         self.chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-        ...
 
     def retrieve_similar_question(self, user_query):
         """Finds the most similar question from the stored Q&A pairs and returns the embedding vector value, question, and answer.

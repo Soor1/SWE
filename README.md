@@ -68,14 +68,14 @@ Vercel for function based cloud compute (similar to AWS lambda) to be used in da
 * [https://vercel.com/](https://vercel.com/) 
 
 
-* For Development *
+## Development Instructions
 
 Go to a directory where you want the project.
 ```
 git clone https://github.com/Soor1/SWE.git
 ```
 
-Create a new branch based off of dev.
+FOR EACH NEW FEATURE, create a new branch based off of dev.
 ```
 git checkout -b new-branch-name dev
 ```
@@ -121,4 +121,11 @@ HUGGINGFACE_EMAIL="INSERT_EMAIL_HERE"
 HUGGINGFACE_PASSWD="INSERT_PASSWORD_HERE"
 PINECONE_API_KEY="GET_API_KEY_FROM_JOSEPH"
 API_KEY="INSERT_CONGRESS_API_KEY"
+```
+
+## Testing you application
+
+Run the following command to run our chainlit frontend:
+```
+chainlit run app/app.py
 ```
