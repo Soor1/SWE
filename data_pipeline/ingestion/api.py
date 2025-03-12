@@ -22,6 +22,9 @@ def extract_text_from_xml(xml_url):
     except Exception as e:
         return "Error fetching XML"
 
+def chunk_text(text, chunk_size=250):
+    return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+
 for bill in bills:
     bill_number = bill["number"]
     title = bill["title"]
@@ -44,6 +47,8 @@ for bill in bills:
     if full_text_link != "No XML available":
         full_text = extract_text_from_xml(full_text_link)
 
+    chunked_text = chunk_text(full_text, chunk_size=250)
+
     bill_data = {
         "Title": title,
         "Bill_Number": bill_number,
@@ -51,8 +56,10 @@ for bill in bills:
         "Origin_Chamber": origin_chamber,
         "Bill_Type": bill_type,
         "Full_Text_Link": full_text_link,
-        "Full_Text": full_text
+        "Full_Text": full_text,
+        "Chunked_Text": chunked_text 
     }
+    
     final_output.append(bill_data)
 
 with open("final_output.json", "w") as file:
