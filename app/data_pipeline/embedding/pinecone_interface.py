@@ -10,16 +10,14 @@ import traceback
 from scipy.spatial.distance import cosine
 
 
-index_name = "legislation-chat"
-
 
 class PineconeInterface:
     def __init__(self, hf_embedding_model_name: str = "all-mpnet-base-v2"):
         load_dotenv()
 
         self.model = SentenceTransformer(hf_embedding_model_name)
-        # self.pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
-        self.pc = Pinecone(api_key="error_key")
+        self.pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+        # self.pc = Pinecone(api_key="error_key")
         assert self.check_connection()
 
 
@@ -27,10 +25,10 @@ class PineconeInterface:
         try:
             indexes = self.pc.list_indexes()
             if indexes:
-                print(f"Pinecone is live! Available indexes: {indexes}")
+                # print(f"Pinecone is live! Available indexes: {indexes}")
                 return True
             else:
-                print("Pinecone is live, but no indexes found.")
+                # print("Pinecone is live, but no indexes found.")
                 return True
         except Exception as e:
             print(f"Error connecting to Pinecone: {e}")
@@ -38,7 +36,7 @@ class PineconeInterface:
 
     def store(self, 
               input_data: List[Dict],
-              index_name: str, 
+              index_name: str = "legislation-chat", 
               key_to_be_embedded: Optional[str] = None,
         ) -> Dict[str, str]:
 
@@ -61,14 +59,14 @@ class PineconeInterface:
             
             index = self.pc.Index(index_name)
 
-            namespace = input_data[0]["Update_Date"]
+            namespace = input_data[0]["update_date"]
             today = datetime.now().strftime("%Y-%m-%d")
 
             if namespace == today:
-                print(f"The Update_Date {namespace} matches today's date.")
+                print(f"The update_date {namespace} matches today's date.")
             else:
-                print(f"The Update_Date {namespace} does NOT match today's date. Today's date is {today}.")
-                return
+                print(f"The update_date {namespace} does NOT match today's date. Today's date is {today}.")
+                return {"status": "update_date does not match today's date."}
             
             vectors = [
                 {
@@ -78,8 +76,8 @@ class PineconeInterface:
                 }
                 for i in range(len(input_data))
             ]
-            index.upsert(vectors, namespace=namespace)
-
+            upsert_response = index.upsert(vectors, namespace=namespace).to_dict()
+            return upsert_response
 
         except Exception as e:
             print("An error occurred in PineconeInterface.store:")
@@ -88,7 +86,7 @@ class PineconeInterface:
 
     def retrieve(self, 
                   query: str, 
-                  index_name: str, 
+                  index_name: str = "legislation-chat", 
                   limit: int = 3, 
                   closeness_threshold: Optional[float] = 1,
                   namespace: str = datetime.now().strftime("%Y-%m-%d")
@@ -99,14 +97,13 @@ class PineconeInterface:
             assert namespace == datetime.now().strftime("%Y-%m-%d")
 
             index = self.pc.Index(index_name)
-            query_embedding = self.model.encode(query)
+            query_embedding = self.model.encode(query).tolist()
             results = index.query(
-                queries=[query_embedding], 
+                vector=query_embedding,
                 top_k=limit,
                 include_metadata=True,
                 namespace=namespace
                 )
-            print(f"Results: {results}")
 
             final_results = []
             if results and "matches" in results:
