@@ -2,11 +2,13 @@ import os
 import json
 import requests
 import xml.etree.ElementTree as ET
+from dotenv import load_dotenv
 
-key = os.getenv("API_KEY")
+load_dotenv(override=True)
+
+key = os.environ.get("API_KEY")
 
 final_output = []
-
 response = requests.get(f"https://api.congress.gov/v3/bill?api_key={key}")
 bills = response.json().get("bills", [])
 
@@ -55,5 +57,5 @@ for bill in bills:
     }
     final_output.append(bill_data)
 
-with open("final_output.json", "w") as file:
+with open("data/complete_data.json", "w") as file:
     json.dump(final_output, file, indent=4)
