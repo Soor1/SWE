@@ -123,9 +123,22 @@ PINECONE_API_KEY="GET_API_KEY_FROM_JOSEPH"
 API_KEY="INSERT_CONGRESS_API_KEY"
 ```
 
-## Testing you application
+## Running you application
 
 Run the following command to run our chainlit frontend:
 ```
 chainlit run app/app.py
+```
+
+To load data into the pinecone vector database, run:
+```
+python app/data_pipeline/main.py
+```
+
+
+## Testing features
+
+If you want to test the retrievals, run:
+```
+python -m scripts.test_retrieval 
 ```

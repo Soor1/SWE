@@ -6,11 +6,11 @@ from agent.chatbot import RAGAgent
     Main entry point for the application.
 """
 
-ragAgent = RAGAgent()
+rag_agent = RAGAgent()
 
 @cl.on_message
 async def main(message: cl.Message):
-    response = ragAgent.chatbot.chat(message.content).wait_until_done()
+    response = rag_agent.chatbot.chat(message.content).wait_until_done()
 
     await cl.Message(
         content=response,
