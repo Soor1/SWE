@@ -66,3 +66,66 @@ Render for long-running cloud compute for web app:
 Vercel for function based cloud compute (similar to AWS lambda) to be used in data ingestion:
 
 * [https://vercel.com/](https://vercel.com/) 
+
+
+## Development Instructions
+
+Go to a directory where you want the project.
+```
+git clone https://github.com/Soor1/SWE.git
+```
+
+FOR EACH NEW FEATURE, create a new branch based off of dev.
+```
+git checkout -b new-branch-name dev
+```
+
+Create and activate virtual environment.
+```
+python -m venv .venv
+source .venv/Scripts/activate 
+#.venv/Scripts/activate for powershell or command prompt
+#.venv/Scripts/activate.bat otherwise
+```
+You should see a little (.venv) tag in your terminal now.
+
+
+Run the following for installation requirements (this might take a while so be patient)
+```
+pip install -r requirements.txt
+```
+
+## Getting your API Keys!
+* Create account on: https://huggingface.co/
+* Login at: https://huggingface.co/chat/
+* Remember your username and password!!
+
+Create a .env file in your working directory (SWE/) with the following content:
+```
+HUGGINGFACE_EMAIL="INSERT_EMAIL_HERE"
+HUGGINGFACE_PASSWD="INSERT_PASSWORD_HERE"
+```
+
+Message @josephmolina256 for the pinecone API key and add it to your .env file:
+
+```
+HUGGINGFACE_EMAIL="INSERT_EMAIL_HERE"
+HUGGINGFACE_PASSWD="INSERT_PASSWORD_HERE"
+PINECONE_API_KEY="GET_API_KEY_FROM_JOSEPH"
+```
+
+Visit https://api.congress.gov/ to get your congress API key to fetch bills and insert into your .env
+
+```
+HUGGINGFACE_EMAIL="INSERT_EMAIL_HERE"
+HUGGINGFACE_PASSWD="INSERT_PASSWORD_HERE"
+PINECONE_API_KEY="GET_API_KEY_FROM_JOSEPH"
+API_KEY="INSERT_CONGRESS_API_KEY"
+```
+
+## Testing you application
+
+Run the following command to run our chainlit frontend:
+```
+chainlit run app/app.py
+```
