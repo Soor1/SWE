@@ -2,17 +2,13 @@ import json
 import os
 
 from typing import Literal, Union
+from datetime import datetime
 
 from ingestion.data_retrieval import load_chunked_data_to_json
 from embedding.pinecone_interface import PineconeInterface
 
 
-def load_data(
-        data_path: Union[
-            Literal["data/complete_data.json"], 
-            Literal["data/tagged_chunks.json"], 
-            Literal["data/chunked_data.json"]
-            ]):
+def load_data(data_path: str):
     try:
         print("loading chunked data...")
         if not os.path.exists(data_path):
@@ -39,7 +35,7 @@ def tag_chunks(complete_data):
                     "chunk": chunk
                 }
             )
-    with open("data/tagged_chunks.json", "w") as f:
+    with open(f"data/{datetime.now().strftime("%Y-%m-%d")}_tagged_chunks.json", "w") as f:
         json.dump(tagged_chunks, f, indent=4)
     return tagged_chunks
 
@@ -47,11 +43,11 @@ def tag_chunks(complete_data):
 pincone_inteface = PineconeInterface()
 assert pincone_inteface.check_connection()
 
-chunked_data = load_data(data_path="data/chunked_data.json")
+chunked_data = load_data(data_path=f"data/{datetime.now().strftime("%Y-%m-%d")}_chunked_data.json")
 assert len(chunked_data) != 0 
 
 tagged_chunks = tag_chunks(chunked_data)
-tagged_chunks = load_data(data_path="data/tagged_chunks.json")
+tagged_chunks = load_data(data_path=f"data/{datetime.now().strftime("%Y-%m-%d")}_tagged_chunks.json")
 assert len(tagged_chunks) != 0
 
 

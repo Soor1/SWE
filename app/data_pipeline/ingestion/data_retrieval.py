@@ -3,6 +3,7 @@ import json
 import requests
 import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
+from datetime import datetime
 
 def load_chunked_data_to_json():
     load_dotenv(override=True)
@@ -67,5 +68,5 @@ def load_chunked_data_to_json():
         
         final_output.append(bill_data)
 
-    with open("data/chunked_data.json", "w") as file:
+    with open(f"data/{datetime.now().strftime("%Y-%m-%d")}_chunked_data.json", "w") as file:
         json.dump(final_output, file, indent=4)
