@@ -88,7 +88,7 @@ class PineconeInterface:
                   query: str, 
                   index_name: str = "legislation-chat", 
                   limit: int = 3, 
-                  closeness_threshold: Optional[float] = 1,
+                  closeness_threshold: Optional[float] = float("-inf"),
                   namespace: str = datetime.now().strftime("%Y-%m-%d")
         ) -> Optional[List[Dict]]:
         try:
@@ -108,7 +108,7 @@ class PineconeInterface:
             final_results = []
             if results and "matches" in results:
                 for match in results["matches"]:
-                    if match["score"] < closeness_threshold:
+                    if match["score"] > closeness_threshold:
                         final_results.append(match)
             
             return final_results

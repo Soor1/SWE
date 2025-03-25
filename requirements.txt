@@ -6,3 +6,4 @@ scipy
 numpy
 requests
 pinecone
+pymongo
