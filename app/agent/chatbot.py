@@ -69,4 +69,4 @@ class RAGAgent:
         db = self.mongo_client["LegislationChat"]
         collection = db["messages"]  # Collection name
         res = collection.find_one({"email": email})
-        return res["last_message"] if res else None
+        return str(res["last_message"]).strip() if res else None

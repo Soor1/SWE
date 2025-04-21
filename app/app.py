@@ -31,8 +31,10 @@ async def start_chat():
         ).send()
     else:
         retrieved_message = rag_agent.retrieve_last_message(user.identifier)
+        content = "Welcome to the Legislation Chatbot! Ask me anything about legislation. Here is your last message:\n\n" + retrieved_message
+        print(content)
         await cl.Message(
-            content="Welcome to the Legislation Chatbot! Ask me anything about legislation. Here is your last message:\n" + retrieved_message,
+            content=content,
         ).send()
     
 @cl.on_message
