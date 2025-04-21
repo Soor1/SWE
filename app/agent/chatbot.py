@@ -20,6 +20,7 @@ class RAGAgent:
         cookie_path_dir = "./cookies/"
         sign = Login(email, password)
         cookies = sign.login(cookie_dir_path=cookie_path_dir, save_cookies=True)
+        #cookies = sign.login()
         self.chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
 
     def retrieve_similar_question(self, user_query):
