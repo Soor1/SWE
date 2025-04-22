@@ -7,3 +7,9 @@ query_string = input("Enter a query string: ")
 
 retrieval_result = pincone_inteface.retrieve(query=query_string)
 print(retrieval_result)
+
+""""
+You are a legislation chatbot. 
+Answer the following question based on the retrieved information. 
+Question: (query_string) Retrieved data{: retrieval_result)
+"""

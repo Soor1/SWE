@@ -6,6 +6,11 @@ from pymongo.server_api import ServerApi
 
 import os
 from dotenv import load_dotenv
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+from data_pipeline.embedding.pinecone_interface import PineconeInterface
+
+
 
 from data_pipeline.embedding.pinecone_interface import PineconeInterface
 
@@ -52,4 +57,23 @@ class RAGAgent:
         """Finds the most similar question from the stored Q&A pairs and returns the embedding vector value, question, and answer.
         Focus on this in Sprint 1.
         """
-        ...
+        raw_retrieval_result = self.pinecone_interface.retrieve(query=user_query)
+
+        return raw_retrieval_result
+    
+    def store_last_message(self, email, message):
+        """Stores the last message in the database."""
+        db = self.mongo_client["LegislationChat"]  # Database name
+        collection = db["messages"]  # Collection name
+        collection.update_one(
+            {"email": email},
+            {"$set": {"last_message": message}},
+            upsert=True  # Ensures only one document per user email
+        )
+
+    def retrieve_last_message(self, email):
+        """Retrieves the last message from the database."""
+        db = self.mongo_client["LegislationChat"]
+        collection = db["messages"]  # Collection name
+        res = collection.find_one({"email": email})
+        return str(res["last_message"]).strip() if res else None
