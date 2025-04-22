@@ -59,14 +59,8 @@ class PineconeInterface:
             
             index = self.pc.Index(index_name)
 
-            namespace = input_data[0]["update_date"]
-            today = datetime.now().strftime("%Y-%m-%d")
-
-            if namespace == today:
-                print(f"The update_date {namespace} matches today's date.")
-            else:
-                print(f"The update_date {namespace} does NOT match today's date. Today's date is {today}.")
-                return {"status": "update_date does not match today's date."}
+            namespace = input_data[0]["date"]
+            
             
             vectors = [
                 {

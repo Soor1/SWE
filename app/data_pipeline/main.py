@@ -4,7 +4,7 @@ import os
 from typing import Literal, Union
 from datetime import datetime
 
-from ingestion.data_retrieval import load_chunked_data_to_json
+from ingestion.summaries import process_data as load_processed_data
 from embedding.pinecone_interface import PineconeInterface
 
 
@@ -13,7 +13,7 @@ def load_data(data_path: str):
         print("loading chunked data...")
         if not os.path.exists(data_path):
             print("Chunked data not found, loading from API")
-            load_chunked_data_to_json()
+            load_processed_data(data_path)
         with open(data_path, "r") as f:
             data = json.load(f)
     except Exception as e:
@@ -24,10 +24,10 @@ def load_data(data_path: str):
 def tag_chunks(complete_data):
     tagged_chunks = []
     for bill in complete_data:
-        if bill.get("chunked_text", "No XML available") == "No XML available":
+        if bill.get("summary_chunks", "No XML available") == "No XML available":
             continue
-        chunks = bill.pop("chunked_text")
-        bill.pop("full_text")
+        chunks = bill.pop("summary_chunks")
+        bill.pop("summary")
         for chunk in chunks:
             tagged_chunks.append(
                 {
@@ -35,7 +35,7 @@ def tag_chunks(complete_data):
                     "chunk": chunk
                 }
             )
-    with open(f"data/{datetime.now().strftime("%Y-%m-%d")}_tagged_chunks.json", "w") as f:
+    with open(f"data/tagged_chunks.json", "w") as f:
         json.dump(tagged_chunks, f, indent=4)
     return tagged_chunks
 
@@ -47,7 +47,7 @@ chunked_data = load_data(data_path=f"data/{datetime.now().strftime("%Y-%m-%d")}_
 assert len(chunked_data) != 0 
 
 tagged_chunks = tag_chunks(chunked_data)
-tagged_chunks = load_data(data_path=f"data/{datetime.now().strftime("%Y-%m-%d")}_tagged_chunks.json")
+# tagged_chunks = load_data(data_path=f"data/{datetime.now().strftime("%Y-%m-%d")}_tagged_chunks.json")
 assert len(tagged_chunks) != 0
 
 

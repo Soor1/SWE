@@ -3,6 +3,7 @@ from typing import Dict
 import asyncio
 import os
 import json
+from typing import Set
 from data_pipeline.embedding.pinecone_interface import PineconeInterface
 from agent.chatbot import RAGAgent
 
@@ -65,21 +66,14 @@ async def start_chat():
         content=f"Welcome to the Legislation Chatbot! Ask me anything about legislation. Here is your last message:\n{retrieved_message}"
     ).send()
 
-async def process_message(message: str, session: Dict, user_id: str) -> tuple[str, list]:
-    msg_lower = message.lower().strip()
-    session["history"].append({"role": "user", "content": message})
-
-    # Handle follow-up questions using stored Pinecone context
-    if session["last_retrieval"] and any(keyword in msg_lower for keyword in ["when", "why", "how", "explain", "what"]):
-        response = handle_followup(msg_lower, session["last_retrieval"])
-        return response, []
-
+def process_message(message: str, session: Dict, user_id: str) -> tuple[str, list]:
     # Perform RAGAgent retrieval
     raw_retrieval = rag_agent.retrieve_similar_question(message)
     clean_retrieval = []
     for chunk in raw_retrieval:
         clean_retrieval.append(chunk["metadata"]["title"] + "\n" + chunk["metadata"]["chunk"])
 
+    links = set([chunk["metadata"]["full_text_link"] for chunk in raw_retrieval])
     # Generate prompt for LLM
     prompt = f"""You are a helpful assistant that answers questions based on the context provided.
     
@@ -90,15 +84,15 @@ Question:
 {message}
     
 Answer:
-"""
-    llm_response = rag_agent.chatbot.chat(prompt).wait_until_done()
-
+""" 
+    print(prompt)
+    return prompt, list(links)
     # Format response with references
+def format_response(message, llm_response: str, links: Set, user_id: str) -> str:
     formatted_response = f"""
-{llm_response}
 References:
-{"\n".join([chunk["metadata"]["full_text_link"] for chunk in raw_retrieval])}
-"""
+{"\n".join(list(links))}
+""" if links else None
 
     # Store message pair
     message_pair = f"""
@@ -107,30 +101,8 @@ answer: {llm_response}
 """
     rag_agent.store_last_message(user_id, message_pair)
 
-    # Perform Pinecone vector search for additional context
-    try:
-        pinecone_result = await asyncio.get_event_loop().run_in_executor(
-            None, pinecone_interface.retrieve, message
-        )
-        if pinecone_result:
-            session["last_retrieval"] = pinecone_result
-            session["current_topic"] = message
-            formatted_response += f"\n\nAdditional Context:\n{format_legislation_response(pinecone_result)}"
-    except Exception as e:
-        formatted_response += f"\n\nSearch error: {str(e)}"
+    return formatted_response
 
-    elements = [cl.Text(name="full_text", content=session["last_retrieval"]["full_text"], display="hidden")] if session["last_retrieval"] else []
-    return formatted_response, elements
-
-def handle_followup(query: str, context: dict) -> str:
-    """Process follow-up questions using stored context"""
-    if "when" in query:
-        return f"This legislation was introduced on {context.get('introduced_date', 'an unspecified date')}"
-    elif "why" in query:
-        return f"The primary purpose is: {context.get('purpose', 'not specified in the document')}"
-    elif "how" in query:
-        return f"Implementation plan: {context.get('implementation', 'details not available')}"
-    return f"More details: {context.get('summary', 'No additional information available')}"
 
 def format_legislation_response(data: dict) -> str:
     """Structure the Pinecone response into readable format"""
@@ -148,11 +120,20 @@ async def main(message: cl.Message):
     if not user:
         await cl.Message(content="Please sign in to continue.").send()
         return
+    
+    msg = cl.Message(content="")
 
-    response, elements = await process_message(message.content, session, user.identifier)
-    session["history"].append({"role": "assistant", "content": response})
+    prompt, links = process_message(message.content, session, user.identifier)
+    for resp in rag_agent.chatbot.chat(
+        prompt,
+        stream=True
+    ):  
+        if resp:
+            await msg.stream_token(resp["token"])
 
-    await cl.Message(
-        content=response,
-        elements=elements
-    ).send()
+
+    await msg.update()
+    tag = "\n" + format_response(message.content, msg.content, links, user.identifier)
+    if tag:
+        await msg.stream_token(tag)
+        await msg.update()
