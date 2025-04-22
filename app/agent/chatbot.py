@@ -64,3 +64,10 @@ class RAGAgent:
             {"$set": {"last_message": message}},
             upsert=True  # Ensures only one document per user email
         )
+
+    def retrieve_last_message(self, email):
+        """Retrieves the last message from the database."""
+        db = self.mongo_client["LegislationChat"]
+        collection = db["messages"]  # Collection name
+        res = collection.find_one({"email": email})
+        return str(res["last_message"]).strip() if res else None
