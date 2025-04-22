@@ -51,4 +51,6 @@ class RAGAgent:
         """Finds the most similar question from the stored Q&A pairs and returns the embedding vector value, question, and answer.
         Focus on this in Sprint 1.
         """
-        ...
+        raw_retrieval_result = self.pinecone_interface.retrieve(query=user_query)
+
+        return raw_retrieval_result
