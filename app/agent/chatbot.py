@@ -54,3 +54,13 @@ class RAGAgent:
         raw_retrieval_result = self.pinecone_interface.retrieve(query=user_query)
 
         return raw_retrieval_result
+    
+    def store_last_message(self, email, message):
+        """Stores the last message in the database."""
+        db = self.mongo_client["LegislationChat"]  # Database name
+        collection = db["messages"]  # Collection name
+        collection.update_one(
+            {"email": email},
+            {"$set": {"last_message": message}},
+            upsert=True  # Ensures only one document per user email
+        )
